@@ -1,0 +1,4 @@
+# Claude Desktop MCP Gateway
+node_modules/
+*.log
+debug-gateway.log
