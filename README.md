@@ -40,7 +40,17 @@ cd claude-mcp-gateway
 .\install.ps1
 ```
 
-That's it! Restart Claude Desktop and you'll see 31 new MCP tools.
+That's it — **almost**. There's one manual step in CC Switch:
+
+### ⚠️ Enable MCP in CC Switch
+
+1. Open CC Switch → click **Claude Desktop** in the sidebar
+2. Find the **MCP Server** toggle and enable it
+3. Fully quit Claude Desktop (taskbar icon → Quit)
+4. Restart Claude Desktop
+5. Click the 🔌 plug icon — you should see 31 new MCP tools
+
+The toggle enables `isLocalDevMcpEnabled` in the enterprise config. Without it, Claude Desktop ignores `managedMcpServers` even if properly injected.
 
 ### Verify
 
