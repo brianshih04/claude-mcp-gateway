@@ -15,7 +15,7 @@ param(
     [switch]$Uninstall
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 # ============================================================
 # Uninstall mode
@@ -46,7 +46,8 @@ if ($Uninstall) {
                 $Config = Get-Content $ConfigPath -Raw | ConvertFrom-Json
                 if ($Config.managedMcpServers) {
                     $Config.PSObject.Properties.Remove("managedMcpServers")
-                    $Config | ConvertTo-Json -Depth 5 | Set-Content $ConfigPath -Encoding UTF8
+                    $json = $Config | ConvertTo-Json -Depth 5
+                    [System.IO.File]::WriteAllText($ConfigPath, $json, [System.Text.UTF8Encoding]::new($false))
                     Write-Host "  - Removed managedMcpServers from enterprise config"
                 }
             }
@@ -149,14 +150,15 @@ Unregister-ScheduledTask -TaskName "MCP Gateway" -Confirm:$false -ErrorAction Si
 
 $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$DestStartPs1`""
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
+$TriggerRepeat = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 2)
 $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden -StartWhenAvailable -RestartInterval (New-TimeSpan -Minutes 5) -RestartCount 3
 $Principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
 
-Register-ScheduledTask -TaskName "MCP Gateway" -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -Description "Auto-start MCP Gateway for Claude Desktop (31 extra tools)" | Out-Null
+Register-ScheduledTask -TaskName "MCP Gateway" -Action $Action -Trigger $Trigger,@($TriggerRepeat) -Settings $Settings -Principal $Principal -Description "Auto-start MCP Gateway for Claude Desktop (31 extra tools)" | Out-Null
 
 Write-Host "  [OK] Scheduled task 'MCP Gateway' created" -ForegroundColor Green
 Write-Host "       - Runs at logon" -ForegroundColor DarkGray
-Write-Host "       - Auto-restarts every 5 min if crashed" -ForegroundColor DarkGray
+Write-Host "       - Runs at logon + every 2 min (auto-recovery)" -ForegroundColor DarkGray
 
 # ============================================================
 # Step 4: Start gateway + inject config
