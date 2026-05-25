@@ -1,5 +1,15 @@
 # MCP Gateway Changelog
 
+## v2.1.0 (2026-05-25)
+
+### Added
+- **SSE Transport support** — `/messages` endpoints now push JSON-RPC responses through the SSE event stream (`event: message`), properly supporting Claude Desktop's SSE-based MCP protocol. Fixed an issue where tool calls via SSE transport would hang indefinitely because the response was sent as a direct HTTP reply instead of through the event stream
+- **PowerShell UTF-8 output** — stdout pipe now uses `d.toString("utf8")` for proper Unicode handling
+
+### Fixed
+- **PowerShell tool name mismatch** — Renamed from `powershell` to `powershell__powershell` to match the gateway's server-prefix naming convention (`server__tool`). Previously the tool was registered without the prefix while all other tools had it, causing `"Unknown tool"` errors when called with the prefixed name
+- **Filesystem server disabled** — Explicitly commented out to remove filesystem access from the gateway tool list (17 tools remaining: PowerShell, Memory x9, Fetch x6, Sequential Thinking x1)
+
 ## v2.0.1 (2026-05-25)
 
 ### Fixed
