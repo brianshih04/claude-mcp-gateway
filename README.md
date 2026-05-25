@@ -145,7 +145,7 @@ This also unlocks WebFetch (unrestricted egress) and WebSearch in 3P mode.
 
 ### Auto-Recovery
 
-The scheduled task runs `start.ps1` at every logon and every 5 minutes. This handles:
+The scheduled task runs `start.ps1` at every logon and every 2 minutes. This handles:
 - Starting the gateway if it crashed
 - Re-injecting enterprise config if CC Switch overwrote it
 
@@ -154,10 +154,11 @@ The scheduled task runs `start.ps1` at every logon and every 5 minutes. This han
 | Symptom | Fix |
 |---|---|
 | "Server is busy / parked for retry" | Gateway not running → run `.\start.ps1` |
-| No MCP tools visible | CC Switch MCP toggle off → enable in CC Switch settings |
+| No MCP tools visible | Config BOM issue → update to v2.0.1+ and re-run `.\install.ps1` |
 | 0 tools from gateway | npm packages not installed → `npm list -g --depth=0` |
 | Egress/WebFetch broken | Config not injected → run `.\start.ps1` |
-| MCP disappears after provider switch | CC Switch overwrites config → wait 5 min (auto-recovery) |
+| MCP disappears after provider switch | CC Switch overwrites config → wait 2 min (auto-recovery) |
+| install.ps1 crashes at npm install | PowerShell stderr handling → update to v2.0.1+ |
 
 ### Debug Log
 
