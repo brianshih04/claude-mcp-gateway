@@ -107,7 +107,8 @@ if ($NeedMcp) {
 }
 
 if ($Changed) {
-    $Config | ConvertTo-Json -Depth 5 | Set-Content $ConfigPath -Encoding UTF8
+    $json = $Config | ConvertTo-Json -Depth 5
+    [System.IO.File]::WriteAllText($ConfigPath, $json, [System.Text.UTF8Encoding]::new($false))
     Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Enterprise config injected ($ConfigId)" -ForegroundColor Green
 } else {
     Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Enterprise config up-to-date ($ConfigId)"
